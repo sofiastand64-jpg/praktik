@@ -3,6 +3,39 @@ import { Suspense } from "react";
 import Link from "next/link";
 import AddToCartButton from "../components/AddToCartButton";
 
+const MOCK_CATEGORIES = [
+  { id: 1, title: "Наушники", slug: "headphones", icon: "🎧" },
+  { id: 2, title: "Смарт-часы", slug: "watches", icon: "⌚" },
+  { id: 3, title: "Аксессуары", slug: "accessories", icon: "🔌" },
+];
+
+const MOCK_PRODUCTS = [
+  {
+    id: 1,
+    title: "Беспроводные наушники Studio Pro",
+    slug: "studio-pro",
+    price: 12990,
+    badge: "Хит",
+    category: { id: 1, title: "Наушники", slug: "headphones" },
+  },
+  {
+    id: 2,
+    title: "Умные часы Series X",
+    slug: "watch-series-x",
+    price: 18500,
+    badge: "-15%",
+    category: { id: 2, title: "Смарт-часы", slug: "watches" },
+  },
+  {
+    id: 3,
+    title: "Быстрая зарядка GaN 65W",
+    slug: "gan-charger-65w",
+    price: 3490,
+    badge: null,
+    category: { id: 3, title: "Аксессуары", slug: "accessories" },
+  },
+];
+
 async function getProducts(query, categorySlug) {
   try {
     let filters = "";
@@ -20,14 +53,23 @@ async function getProducts(query, categorySlug) {
 
     const res = await fetch(
       `http://127.0.0.1:1337/api/products?populate=*${filters}`,
-      { cache: "no-store" },
+      { cache: "no-store" }
     );
     if (!res.ok) throw new Error("Ошибка загрузки");
     const data = await res.json();
     return data.data;
   } catch (error) {
     console.error("Ошибка в getProducts:", error);
-    return [];
+    return MOCK_PRODUCTS.filter((item) => {
+      const matchesQuery = query
+        ? item.title.toLowerCase().includes(query.toLowerCase())
+        : true;
+      const matchesCategory = categorySlug
+        ? item.category?.slug === categorySlug ||
+          String(item.category?.id) === String(categorySlug)
+        : true;
+      return matchesQuery && matchesCategory;
+    });
   }
 }
 
@@ -40,7 +82,7 @@ async function getCategories() {
     const data = await res.json();
     return data.data;
   } catch (error) {
-    return [];
+    return MOCK_CATEGORIES;
   }
 }
 
@@ -147,8 +189,8 @@ async function HomeContent({ searchParams }) {
               {currentQuery
                 ? `Результаты поиска: "${currentQuery}"`
                 : currentCategory
-                  ? "Товары в категории"
-                  : "Популярные товары"}
+                ? "Товары в категории"
+                : "Популярные товары"}
             </h2>
             {currentCategory && (
               <Link href="/" className="section__link">

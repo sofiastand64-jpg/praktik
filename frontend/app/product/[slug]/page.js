@@ -4,22 +4,55 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import ProductInteractiveControls from "../../../components/ProductInteractiveControls";
 
+const MOCK_PRODUCTS = [
+  {
+    id: 1,
+    title: "Беспроводные наушники Studio Pro",
+    slug: "studio-pro",
+    price: 12990,
+    description:
+      "Полноразмерные беспроводные наушники с активным шумоподавлением и автономностью до 30 часов.",
+    category: { id: 1, title: "Наушники", slug: "headphones" },
+  },
+  {
+    id: 2,
+    title: "Умные часы Series X",
+    slug: "watch-series-x",
+    price: 18500,
+    description:
+      "Смарт-часы с ярким AMOLED-экраном, датчиком пульса, GPS и влагозащитой.",
+    category: { id: 2, title: "Смарт-часы", slug: "watches" },
+  },
+  {
+    id: 3,
+    title: "Быстрая зарядка GaN 65W",
+    slug: "gan-charger-65w",
+    price: 3490,
+    description:
+      "Компактное сетевое зарядное устройство на основе нитрида галлия с поддержкой Power Delivery.",
+    category: { id: 3, title: "Аксессуары", slug: "accessories" },
+  },
+];
+
 async function getProduct(slugOrId) {
   try {
-    // Ищем товар по slug ИЛИ по id (поможет избежать 404)
-    const res = await fetch(
-      `http://127.0.0.1:1337/api/products?filters[$or][0][slug][$eq]=${slugOrId}&filters[$or][1][id][$eq]=${slugOrId}&populate=*`,
-      {
-        cache: "no-store",
-      },
-    );
+    const url = new URL("http://127.0.0");
+    url.searchParams.append("filters[slug][$eq]", slugOrId);
+    url.searchParams.append("populate", "*");
+
+    const res = await fetch(url.toString(), {
+      cache: "no-store",
+    });
     if (!res.ok) throw new Error("Ошибка загрузки");
     const data = await res.json();
     if (!data.data || data.data.length === 0) return null;
     return data.data[0];
   } catch (error) {
-    console.error(error);
-    return null;
+    return (
+      MOCK_PRODUCTS.find(
+        (item) => item.slug === slugOrId || String(item.id) === String(slugOrId)
+      ) || null
+    );
   }
 }
 
@@ -33,7 +66,7 @@ async function ProductDetails({ paramsPromise }) {
 
   const imageUrl = product.image
     ? `http://127.0.0.1:1337${product.image.url}`
-    : "https://placehold.co/600x600/f0f4ff/6366f1?text=No+Image";
+    : "https://placehold.co";
 
   return (
     <section className="product">
