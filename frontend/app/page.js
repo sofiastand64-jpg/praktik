@@ -1,7 +1,18 @@
-// app/page.js
 import { Suspense } from "react";
 import Link from "next/link";
 import AddToCartButton from "../components/AddToCartButton";
+// Добавили больше иконок для разных категорий
+import {
+  Headphones,
+  Watch,
+  Glasses,
+  Package,
+  Keyboard,
+  Mouse,
+  Smartphone,
+  Laptop,
+  Gamepad2,
+} from "lucide-react";
 
 async function getProducts(query, categorySlug) {
   try {
@@ -10,7 +21,6 @@ async function getProducts(query, categorySlug) {
       filters += `&filters[title][$containsi]=${query}`;
     }
     if (categorySlug) {
-      // Проверяем: если categorySlug - это число (id), фильтруем по id. Если текст - по slug.
       if (!isNaN(categorySlug)) {
         filters += `&filters[category][id][$eq]=${categorySlug}`;
       } else {
@@ -26,7 +36,6 @@ async function getProducts(query, categorySlug) {
     const data = await res.json();
     return data.data;
   } catch (error) {
-    console.error("Ошибка в getProducts:", error);
     return [];
   }
 }
@@ -46,16 +55,63 @@ async function getCategories() {
 
 async function CategoriesList() {
   const categories = await getCategories();
+
+  // Улучшенная функция: проверяет и slug, и название (на русском и английском)
+  const getCategoryIcon = (slug, title) => {
+    const s = (slug || "").toLowerCase();
+    const t = (title || "").toLowerCase();
+
+    // Аудио
+    if (s.includes("audio") || t.includes("аудио") || t.includes("audio"))
+      return <Headphones size={32} />;
+    // Часы
+    if (s.includes("watch") || t.includes("час") || t.includes("watch"))
+      return <Watch size={32} />;
+    // Аксессуары
+    if (s.includes("access") || t.includes("аксесс") || t.includes("access"))
+      return <Glasses size={32} />;
+    // Периферия / Клавиатуры
+    if (
+      s.includes("peripher") ||
+      t.includes("перифер") ||
+      t.includes("клавиатур") ||
+      t.includes("keyboard")
+    )
+      return <Keyboard size={32} />;
+    // Мыши
+    if (s.includes("mouse") || t.includes("мыш")) return <Mouse size={32} />;
+    // Смартфоны
+    if (s.includes("phone") || t.includes("телефон") || t.includes("смартфон"))
+      return <Smartphone size={32} />;
+    // Ноутбуки / ПК
+    if (
+      s.includes("laptop") ||
+      t.includes("ноутбук") ||
+      t.includes("компьютер")
+    )
+      return <Laptop size={32} />;
+    // Игры
+    if (s.includes("game") || t.includes("игр")) return <Gamepad2 size={32} />;
+
+    // Если ничего не подошло — иконка коробки
+    return <Package size={32} />;
+  };
+
   return (
     <div className="categories">
       {categories.map((cat) => (
-        // Если slug пустой, используем id категории
         <Link
           href={`/?category=${cat.slug || cat.id}`}
           key={cat.id}
           className="category-card"
         >
-          <span className="category-card__icon">{cat.icon}</span>
+          <span
+            className="category-card__icon"
+            style={{ color: "var(--primary)", marginBottom: "12px" }}
+          >
+            {/* Передаем и slug, и title */}
+            {getCategoryIcon(cat.slug, cat.title)}
+          </span>
           <span className="category-card__title">{cat.title}</span>
           <span className="category-card__count">Смотреть товары</span>
         </Link>
@@ -70,7 +126,7 @@ async function ProductsList({ query, categorySlug }) {
   if (products.length === 0) {
     return (
       <p>
-        Товары не найдены. Убедитесь, что они привязаны к этой категории и
+        Товары не найдены. Убедитесь, что они привязаны к категории и
         опубликованы в Strapi.
       </p>
     );

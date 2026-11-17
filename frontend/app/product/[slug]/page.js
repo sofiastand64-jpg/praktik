@@ -1,12 +1,11 @@
-// app/product/[slug]/page.js
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import ProductInteractiveControls from "../../../components/ProductInteractiveControls";
+import { Truck, ShieldCheck } from "lucide-react";
 
 async function getProduct(slugOrId) {
   try {
-    // Ищем товар по slug ИЛИ по id (поможет избежать 404)
     const res = await fetch(
       `http://127.0.0.1:1337/api/products?filters[$or][0][slug][$eq]=${slugOrId}&filters[$or][1][id][$eq]=${slugOrId}&populate=*`,
       {
@@ -59,8 +58,12 @@ async function ProductDetails({ paramsPromise }) {
           <ProductInteractiveControls product={product} />
 
           <div className="product__delivery">
-            <span>🚚 Бесплатная доставка от 3000 ₽</span>
-            <span>🛡 Гарантия 12 месяцев</span>
+            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Truck size={18} /> Бесплатная доставка от 3000 ₽
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <ShieldCheck size={18} /> Гарантия 12 месяцев
+            </span>
           </div>
         </div>
       </div>

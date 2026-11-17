@@ -1,6 +1,27 @@
+// components/Footer.jsx
 import Link from 'next/link';
 
-export default function Footer() {
+async function getGlobalSettings() {
+  try {
+    // Используем точный адрес с двойкой на конце
+    const res = await fetch('http://127.0.0.1:1337/api/global-settings2', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Ошибка загрузки настроек:", error);
+    return null;
+  }
+}
+
+export default async function Footer() {
+  const settings = await getGlobalSettings();
+
+  // Берем данные из базы. Если их нет — показываем старые (заглушки)
+  const phone = settings?.phone || '8 800 000-00-00';
+  const email = settings?.email || 'hello@shoply.ru';
+  const description = settings?.description || 'Маркетплейс гаджетов и электроники.';
+
   return (
     <footer className="footer">
       <div className="container footer__inner">
@@ -9,7 +30,7 @@ export default function Footer() {
             <span className="logo__mark">S</span>
             <span className="logo__text">Shoply</span>
           </Link>
-          <p className="footer__text">Маркетплейс гаджетов и электроники.</p>
+          <p className="footer__text">{description}</p>
         </div>
         <div className="footer__col">
           <h4 className="footer__title">Магазин</h4>
@@ -30,8 +51,8 @@ export default function Footer() {
         <div className="footer__col">
           <h4 className="footer__title">Контакты</h4>
           <ul className="footer__list">
-            <li><Link href="tel:+78000000000">8 800 000-00-00</Link></li>
-            <li><Link href="mailto:hello@shoply.ru">hello@shoply.ru</Link></li>
+            <li><Link href={`tel:${phone}`}>{phone}</Link></li>
+            <li><Link href={`mailto:${email}`}>{email}</Link></li>
           </ul>
         </div>
       </div>

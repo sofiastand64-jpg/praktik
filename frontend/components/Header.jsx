@@ -1,10 +1,10 @@
-// components/Header.jsx
 "use client";
 
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense } from 'react';
+import { Search, ShoppingCart } from 'lucide-react';
 
 function SearchForm() {
   const router = useRouter();
@@ -29,7 +29,9 @@ function SearchForm() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <button type="submit" className="search__btn">🔍</button>
+      <button type="submit" className="search__btn">
+        <Search size={18} color="#6b7280" />
+      </button>
     </form>
   );
 }
@@ -57,7 +59,8 @@ export default function Header() {
           </Suspense>
           
           <Link href="/cart" className="btn btn--ghost cart-btn">
-            🛒 <span className="cart-btn__count">{cartCount}</span>
+            <ShoppingCart size={20} />
+            <span className="cart-btn__count">{cartCount}</span>
           </Link>
         </div>
       </div>
