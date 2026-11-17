@@ -3,7 +3,6 @@ import Link from 'next/link';
 
 async function getGlobalSettings() {
   try {
-    // Используем точный адрес с двойкой на конце
     const res = await fetch('http://127.0.0.1:1337/api/global-settings2', { cache: 'no-store' });
     if (!res.ok) return null;
     const data = await res.json();
@@ -17,7 +16,6 @@ async function getGlobalSettings() {
 export default async function Footer() {
   const settings = await getGlobalSettings();
 
-  // Берем данные из базы. Если их нет — показываем старые (заглушки)
   const phone = settings?.phone || '8 800 000-00-00';
   const email = settings?.email || 'hello@shoply.ru';
   const description = settings?.description || 'Маркетплейс гаджетов и электроники.';
