@@ -1,11 +1,10 @@
-// components/Footer.jsx
-import Link from 'next/link';
+import Link from "next/link";
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://127.0.0.1:1337";
 
 async function getGlobalSettings() {
   try {
-    const res = await fetch(`${STRAPI_URL}/api/global-settings2`, { cache: 'no-store' });
+    const res = await fetch(`${STRAPI_URL}/api/global-settings2`, { cache: "no-store" });
     if (!res.ok) return null;
     const data = await res.json();
     return data.data;
@@ -17,10 +16,9 @@ async function getGlobalSettings() {
 
 export default async function Footer() {
   const settings = await getGlobalSettings();
-
-  const phone = settings?.phone || '8 800 000-00-00';
-  const email = settings?.email || 'hello@shoply.ru';
-  const description = settings?.description || 'Маркетплейс гаджетов и электроники.';
+  const phone = settings?.phone || "8 800 000-00-00";
+  const email = settings?.email || "hello@shoply.ru";
+  const description = settings?.description || "Маркетплейс гаджетов и электроники.";
 
   return (
     <footer className="footer">
@@ -35,9 +33,9 @@ export default async function Footer() {
         <div className="footer__col">
           <h4 className="footer__title">Магазин</h4>
           <ul className="footer__list">
-            <li><Link href="#catalog">Каталог</Link></li>
-            <li><Link href="#categories">Категории</Link></li>
-            <li><Link href="#">Акции</Link></li>
+            <li><Link href="/#catalog">Каталог</Link></li>
+            <li><Link href="/#categories">Категории</Link></li>
+            <li><Link href="/#sales">Акции</Link></li>
           </ul>
         </div>
         <div className="footer__col">

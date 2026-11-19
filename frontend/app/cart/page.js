@@ -1,4 +1,3 @@
-// app/cart/page.js
 "use client";
 
 import { useCart } from "../../context/CartContext";
@@ -6,7 +5,6 @@ import Link from "next/link";
 
 export default function CartPage() {
   const { cart, removeFromCart, cartCount, updateQuantity } = useCart();
-
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
@@ -45,38 +43,43 @@ export default function CartPage() {
         }}
       >
         {cart.map((item) => {
-          // BUG-5: Берем готовую строку URL
           const imageUrl =
             item.imageUrl || "https://placehold.co/100x100?text=No";
-
           return (
             <div
               key={item.id}
               style={{
                 display: "flex",
+                flexWrap: "wrap",
                 alignItems: "center",
                 gap: "20px",
                 borderBottom: "1px solid var(--border)",
                 paddingBottom: "20px",
               }}
             >
-              <img
-                src={imageUrl}
-                alt={item.title}
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                }}
-              />
-              <div style={{ flex: 1 }}>
-                <h3 style={{ fontSize: "18px", marginBottom: "5px" }}>
-                  {item.title}
-                </h3>
+              <Link href={`/product/${item.id}`}>
+                <img
+                  src={imageUrl}
+                  alt={item.title}
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
+              </Link>
+              <div style={{ flex: 1, minWidth: "150px" }}>
+                <Link
+                  href={`/product/${item.id}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <h3 style={{ fontSize: "18px", marginBottom: "5px" }}>
+                    {item.title}
+                  </h3>
+                </Link>
                 <p style={{ color: "var(--text-muted)" }}>{item.price} ₽</p>
               </div>
-
               <div className="qty" style={{ height: "40px" }}>
                 <button
                   type="button"
@@ -102,7 +105,6 @@ export default function CartPage() {
                   +
                 </button>
               </div>
-
               <div
                 style={{
                   fontWeight: "bold",
@@ -135,6 +137,8 @@ export default function CartPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: "wrap",
+          gap: "20px",
         }}
       >
         <div style={{ fontSize: "24px", fontWeight: "bold" }}>
@@ -142,7 +146,10 @@ export default function CartPage() {
         </div>
         <button
           className="btn btn--primary btn--lg"
-          onClick={() => alert("Оформление заказа в разработке!")}
+          onClick={() => {
+            // Вместо alert можно сделать модальное окно или переход на страницу оформления
+            console.log("Оформление заказа");
+          }}
         >
           Оформить заказ
         </button>

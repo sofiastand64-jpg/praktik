@@ -77,12 +77,15 @@ ul { list-style: none; }
   border: 1px solid var(--border);
 }
 .btn--ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+/* Стиль для кнопки "Добавлено" */
 .btn--success {
   background: #10b981;
   color: #fff;
   cursor: default;
   pointer-events: none;
 }
+
 .btn--sm { padding: 8px 14px; font-size: 13px; }
 .btn--lg { padding: 14px 28px; font-size: 16px; }
 
@@ -129,9 +132,9 @@ ul { list-style: none; }
   font-weight: 500;
   color: var(--text-muted);
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 .nav__link:hover { color: var(--text); background: var(--bg-alt); }
-.nav__link--active { color: var(--primary); background: var(--primary-light); }
 
 .header__actions { display: flex; gap: 12px; margin-left: auto; align-items: center; }
 
@@ -341,23 +344,6 @@ ul { list-style: none; }
   color: var(--text);
 }
 
-/* ============ CTA ============ */
-.cta {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: #fff;
-  padding: 48px;
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  flex-wrap: wrap;
-}
-.cta__title { font-size: 28px; margin-bottom: 8px; letter-spacing: -0.02em; }
-.cta__text { opacity: 0.9; max-width: 540px; }
-.cta .btn--primary { background: #fff; color: var(--primary); }
-.cta .btn--primary:hover { background: var(--bg-alt); }
-
 /* ============ Footer ============ */
 .footer { background: #111827; color: #d1d5db; padding: 56px 0 0; flex-shrink: 0; }
 .footer__inner {
@@ -406,11 +392,6 @@ ul { list-style: none; }
   aspect-ratio: 1;
 }
 .product__main-img img { width: 100%; height: 100%; object-fit: cover; }
-.product__thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
-.product__thumb { border-radius: var(--radius); overflow: hidden; aspect-ratio: 1; border: 2px solid transparent; transition: border-color 0.15s; }
-.product__thumb--active { border-color: var(--primary); }
-.product__thumb img { width: 100%; height: 100%; object-fit: cover; }
-
 .product__category { color: var(--primary); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
 .product__title { font-size: clamp(24px, 3.5vw, 36px); margin: 8px 0 16px; letter-spacing: -0.02em; line-height: 1.2; }
 .product__meta { display: flex; gap: 20px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; font-size: 14px; }
@@ -433,7 +414,6 @@ ul { list-style: none; }
   .hero__inner, .product__inner { grid-template-columns: 1fr; }
   .hero__visual { order: -1; }
   .footer__inner { grid-template-columns: 1fr 1fr; }
-  .cta { padding: 32px; }
   .search__input { width: 180px; }
 }
 
@@ -441,12 +421,24 @@ ul { list-style: none; }
   /* Шапка */
   .header__inner { height: auto; padding-top: 12px; padding-bottom: 12px; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
   .header { position: static; }
-  .nav { display: none; } /* На мобилках прячем меню */
   
-  /* Поиск на мобилке */
+  /* Навигация: делаем горизонтальную прокрутку */
+  .nav { 
+    display: flex; 
+    width: 100%; 
+    order: 4; 
+    margin-left: 0; 
+    padding: 8px 0; 
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Скрываем скроллбар в Firefox */
+  }
+  .nav::-webkit-scrollbar { display: none; } /* Скрываем скроллбар в Chrome/Safari */
+  
+  /* Поиск на мобилке (теперь он виден!) */
   .search { display: flex; width: 100%; order: 3; margin-top: 8px; }
   .search__input { width: 100%; }
-  .header__actions { margin-left: 0; }
+  .header__actions { margin-left: 0; width: 100%; justify-content: space-between; }
 
   /* Секции */
   .section { padding: 40px 0; }
@@ -461,8 +453,6 @@ ul { list-style: none; }
   .product-card__body { padding: 12px; }
   .product-card__title { font-size: 14px; margin-bottom: 4px; }
   .product-card__price { font-size: 16px; }
-  
-  /* Кнопка "В корзину" съезжает на новую строку под цену */
   .product-card__footer { flex-direction: column; align-items: stretch; gap: 8px; }
   .product-card__footer .btn { width: 100%; text-align: center; }
 
@@ -473,5 +463,4 @@ ul { list-style: none; }
 
   /* Подвал */
   .footer__inner { grid-template-columns: 1fr; gap: 24px; }
-  .cta__title { font-size: 22px; }
 }

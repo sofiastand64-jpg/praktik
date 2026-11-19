@@ -1,4 +1,3 @@
-// app/page.js
 import { Suspense } from "react";
 import Link from "next/link";
 import AddToCartButton from "../components/AddToCartButton";
@@ -20,11 +19,15 @@ const STRAPI_URL =
 async function getProducts(query, categorySlug) {
   try {
     let filters = "";
-    if (query) filters += `&filters[title][$containsi]=${query}`;
+    if (query)
+      filters += `&filters[title][$containsi]=${encodeURIComponent(query)}`;
     if (categorySlug) {
-      if (!isNaN(categorySlug))
+      // Исправление: проверяем, является ли categorySlug числом (id) или строкой (slug)
+      if (/^\d+$/.test(categorySlug)) {
         filters += `&filters[category][id][$eq]=${categorySlug}`;
-      else filters += `&filters[category][slug][$eq]=${categorySlug}`;
+      } else {
+        filters += `&filters[category][slug][$eq]=${encodeURIComponent(categorySlug)}`;
+      }
     }
 
     const res = await fetch(`${STRAPI_URL}/api/products?populate=*${filters}`, {
@@ -49,7 +52,6 @@ async function getCategories() {
     return data.data;
   } catch (error) {
     console.error("Ошибка в getCategories:", error);
-    // Возвращаем объект с ошибкой, чтобы показать её на экране
     return { error: error.message };
   }
 }
@@ -57,7 +59,6 @@ async function getCategories() {
 async function CategoriesList() {
   const response = await getCategories();
 
-  // Если произошла ошибка — показываем её
   if (response?.error) {
     return (
       <div
@@ -70,13 +71,11 @@ async function CategoriesList() {
       >
         <h3>Ошибка загрузки категорий!</h3>
         <p>{response.error}</p>
-        <p>Проверь, запущен ли Strapi на {STRAPI_URL}</p>
       </div>
     );
   }
 
   const categories = response || [];
-
   if (categories.length === 0) {
     return (
       <p style={{ color: "var(--text-muted)" }}>
@@ -146,6 +145,9 @@ async function ProductsList({ query, categorySlug }) {
                 src={imageUrl}
                 alt={product.title}
                 className="product-card__img"
+                loading="lazy"
+                width="300"
+                height="300"
               />
               {product.badge && (
                 <span className="product-card__badge product-card__badge--sale">
@@ -178,6 +180,9 @@ async function HomeContent({ searchParams }) {
   const resolvedParams = await searchParams;
   const currentQuery = resolvedParams?.q || "";
   const currentCategory = resolvedParams?.category || "";
+  const categoryTitle = currentCategory
+    ? `Товары в категории "${currentCategory}"`
+    : "Популярные товары";
 
   return (
     <>
@@ -200,9 +205,7 @@ async function HomeContent({ searchParams }) {
             <h2 className="section__title">
               {currentQuery
                 ? `Результаты поиска: "${currentQuery}"`
-                : currentCategory
-                  ? "Товары в категории"
-                  : "Популярные товары"}
+                : categoryTitle}
             </h2>
             {currentCategory && (
               <Link href="/" className="section__link">
@@ -250,6 +253,7 @@ export default function Home({ searchParams }) {
           </div>
         </div>
       </section>
+
       <Suspense fallback={<p>Загрузка...</p>}>
         <HomeContent searchParams={searchParams} />
       </Suspense>
