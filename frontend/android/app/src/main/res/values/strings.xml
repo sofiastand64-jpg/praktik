@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Shoply</string>
+    <string name="title_activity_main">Shoply</string>
+    <string name="package_name">ru.shoply.app</string>
+    <string name="custom_url_scheme">ru.shoply.app</string>
+</resources>
