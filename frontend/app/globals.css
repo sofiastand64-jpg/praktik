@@ -20,7 +20,7 @@
 
 html { scroll-behavior: smooth; }
 
-/* Делаем Sticky Footer */
+/* Flexbox для Sticky Footer (прибиваем подвал к низу) */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -30,11 +30,11 @@ body {
   -webkit-font-smoothing: antialiased;
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Сайт занимает минимум весь экран */
+  min-height: 100vh;
 }
 
 main {
-  flex: 1 0 auto; /* Основная часть растягивается, прижимая подвал вниз */
+  flex: 1 0 auto;
 }
 
 img { max-width: 100%; display: block; }
@@ -77,6 +77,12 @@ ul { list-style: none; }
   border: 1px solid var(--border);
 }
 .btn--ghost:hover { border-color: var(--primary); color: var(--primary); }
+.btn--success {
+  background: #10b981;
+  color: #fff;
+  cursor: default;
+  pointer-events: none;
+}
 .btn--sm { padding: 8px 14px; font-size: 13px; }
 .btn--lg { padding: 14px 28px; font-size: 16px; }
 
@@ -416,7 +422,7 @@ ul { list-style: none; }
 .qty { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .qty__btn { width: 44px; height: 48px; font-size: 18px; font-weight: 600; color: var(--text); transition: background 0.15s; }
 .qty__btn:hover { background: var(--bg-alt); }
-.qty__input { width: 56px; height: 48px; text-align: center; border: none; outline: none; font-weight: 600; -moz-appearance: textfield; }
+.qty__input { width: 56px; height: 48px; text-align: center; border: none; outline: none; font-weight: 600; appearance: textfield; -moz-appearance: textfield; }
 .qty__input::-webkit-outer-spin-button,
 .qty__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
@@ -435,7 +441,7 @@ ul { list-style: none; }
   /* Шапка */
   .header__inner { height: auto; padding-top: 12px; padding-bottom: 12px; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
   .header { position: static; }
-  .nav { display: none; } /* На мобилках прячем меню, чтобы не налезало */
+  .nav { display: none; } /* На мобилках прячем меню */
   
   /* Поиск на мобилке */
   .search { display: flex; width: 100%; order: 3; margin-top: 8px; }
@@ -468,4 +474,4 @@ ul { list-style: none; }
   /* Подвал */
   .footer__inner { grid-template-columns: 1fr; gap: 24px; }
   .cta__title { font-size: 22px; }
-} 
+}

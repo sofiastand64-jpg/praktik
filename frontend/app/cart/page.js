@@ -45,9 +45,9 @@ export default function CartPage() {
         }}
       >
         {cart.map((item) => {
-          const imageUrl = item.image
-            ? `http://127.0.0.1:1337${item.image.url}`
-            : "https://placehold.co/100x100?text=No";
+          // BUG-5: Берем готовую строку URL
+          const imageUrl =
+            item.imageUrl || "https://placehold.co/100x100?text=No";
 
           return (
             <div
@@ -77,7 +77,6 @@ export default function CartPage() {
                 <p style={{ color: "var(--text-muted)" }}>{item.price} ₽</p>
               </div>
 
-              {/* Блок с кнопками - + прямо в корзине */}
               <div className="qty" style={{ height: "40px" }}>
                 <button
                   type="button"

@@ -1,7 +1,7 @@
+// app/page.js
 import { Suspense } from "react";
 import Link from "next/link";
 import AddToCartButton from "../components/AddToCartButton";
-// Добавили больше иконок для разных категорий
 import {
   Headphones,
   Watch,
@@ -14,86 +14,93 @@ import {
   Gamepad2,
 } from "lucide-react";
 
+const STRAPI_URL =
+  process.env.NEXT_PUBLIC_STRAPI_URL || "http://127.0.0.1:1337";
+
 async function getProducts(query, categorySlug) {
   try {
     let filters = "";
-    if (query) {
-      filters += `&filters[title][$containsi]=${query}`;
-    }
+    if (query) filters += `&filters[title][$containsi]=${query}`;
     if (categorySlug) {
-      if (!isNaN(categorySlug)) {
+      if (!isNaN(categorySlug))
         filters += `&filters[category][id][$eq]=${categorySlug}`;
-      } else {
-        filters += `&filters[category][slug][$eq]=${categorySlug}`;
-      }
+      else filters += `&filters[category][slug][$eq]=${categorySlug}`;
     }
 
-    const res = await fetch(
-      `http://127.0.0.1:1337/api/products?populate=*${filters}`,
-      { cache: "no-store" },
-    );
-    if (!res.ok) throw new Error("Ошибка загрузки");
+    const res = await fetch(`${STRAPI_URL}/api/products?populate=*${filters}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error("Ошибка загрузки товаров");
     const data = await res.json();
     return data.data;
   } catch (error) {
+    console.error("Ошибка в getProducts:", error);
     return [];
   }
 }
 
 async function getCategories() {
   try {
-    const res = await fetch("http://127.0.0.1:1337/api/categories", {
+    const res = await fetch(`${STRAPI_URL}/api/categories`, {
       cache: "no-store",
     });
-    if (!res.ok) throw new Error("Ошибка");
+    if (!res.ok) throw new Error(`Ошибка сервера: ${res.status}`);
     const data = await res.json();
     return data.data;
   } catch (error) {
-    return [];
+    console.error("Ошибка в getCategories:", error);
+    // Возвращаем объект с ошибкой, чтобы показать её на экране
+    return { error: error.message };
   }
 }
 
 async function CategoriesList() {
-  const categories = await getCategories();
+  const response = await getCategories();
 
-  // Улучшенная функция: проверяет и slug, и название (на русском и английском)
+  // Если произошла ошибка — показываем её
+  if (response?.error) {
+    return (
+      <div
+        style={{
+          color: "red",
+          padding: "20px",
+          background: "#fee",
+          borderRadius: "8px",
+        }}
+      >
+        <h3>Ошибка загрузки категорий!</h3>
+        <p>{response.error}</p>
+        <p>Проверь, запущен ли Strapi на {STRAPI_URL}</p>
+      </div>
+    );
+  }
+
+  const categories = response || [];
+
+  if (categories.length === 0) {
+    return (
+      <p style={{ color: "var(--text-muted)" }}>
+        Категории не найдены (база пуста или они не опубликованы).
+      </p>
+    );
+  }
+
   const getCategoryIcon = (slug, title) => {
     const s = (slug || "").toLowerCase();
     const t = (title || "").toLowerCase();
-
-    // Аудио
-    if (s.includes("audio") || t.includes("аудио") || t.includes("audio"))
+    if (s.includes("audio") || t.includes("аудио"))
       return <Headphones size={32} />;
-    // Часы
-    if (s.includes("watch") || t.includes("час") || t.includes("watch"))
-      return <Watch size={32} />;
-    // Аксессуары
-    if (s.includes("access") || t.includes("аксесс") || t.includes("access"))
+    if (s.includes("watch") || t.includes("час")) return <Watch size={32} />;
+    if (s.includes("access") || t.includes("аксесс"))
       return <Glasses size={32} />;
-    // Периферия / Клавиатуры
-    if (
-      s.includes("peripher") ||
-      t.includes("перифер") ||
-      t.includes("клавиатур") ||
-      t.includes("keyboard")
-    )
+    if (s.includes("peripher") || t.includes("перифер"))
       return <Keyboard size={32} />;
-    // Мыши
     if (s.includes("mouse") || t.includes("мыш")) return <Mouse size={32} />;
-    // Смартфоны
-    if (s.includes("phone") || t.includes("телефон") || t.includes("смартфон"))
+    if (s.includes("phone") || t.includes("телефон"))
       return <Smartphone size={32} />;
-    // Ноутбуки / ПК
-    if (
-      s.includes("laptop") ||
-      t.includes("ноутбук") ||
-      t.includes("компьютер")
-    )
+    if (s.includes("laptop") || t.includes("ноутбук"))
       return <Laptop size={32} />;
-    // Игры
     if (s.includes("game") || t.includes("игр")) return <Gamepad2 size={32} />;
-
-    // Если ничего не подошло — иконка коробки
     return <Package size={32} />;
   };
 
@@ -109,7 +116,6 @@ async function CategoriesList() {
             className="category-card__icon"
             style={{ color: "var(--primary)", marginBottom: "12px" }}
           >
-            {/* Передаем и slug, и title */}
             {getCategoryIcon(cat.slug, cat.title)}
           </span>
           <span className="category-card__title">{cat.title}</span>
@@ -122,21 +128,13 @@ async function CategoriesList() {
 
 async function ProductsList({ query, categorySlug }) {
   const products = await getProducts(query, categorySlug);
-
-  if (products.length === 0) {
-    return (
-      <p>
-        Товары не найдены. Убедитесь, что они привязаны к категории и
-        опубликованы в Strapi.
-      </p>
-    );
-  }
+  if (products.length === 0) return <p>Товары не найдены.</p>;
 
   return (
     <div className="products">
       {products.map((product) => {
         const imageUrl = product.image
-          ? `http://127.0.0.1:1337${product.image.url}`
+          ? `${STRAPI_URL}${product.image.url}`
           : "https://placehold.co/600x600/f0f4ff/6366f1?text=No+Image";
         return (
           <article key={product.id} className="product-card">
@@ -252,7 +250,6 @@ export default function Home({ searchParams }) {
           </div>
         </div>
       </section>
-
       <Suspense fallback={<p>Загрузка...</p>}>
         <HomeContent searchParams={searchParams} />
       </Suspense>

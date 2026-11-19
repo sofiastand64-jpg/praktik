@@ -1,9 +1,11 @@
 // components/Footer.jsx
 import Link from 'next/link';
 
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
+
 async function getGlobalSettings() {
   try {
-    const res = await fetch('http://127.0.0.1:1337/api/global-settings2', { cache: 'no-store' });
+    const res = await fetch(`${STRAPI_URL}/api/global-settings2`, { cache: 'no-store' });
     if (!res.ok) return null;
     const data = await res.json();
     return data.data;

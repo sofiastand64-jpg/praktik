@@ -1,16 +1,24 @@
-// components/ProductInteractiveControls.jsx
 "use client";
 
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { Check } from 'lucide-react';
+
+const MAX_QTY = 99;
 
 export default function ProductInteractiveControls({ product }) {
   const [qty, setQty] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
   const { addToCart } = useCart();
 
   const handleAdd = () => {
     addToCart(product, qty);
-    // Убрали alert!
+    setIsAdded(true);
+    
+    // Через 2 секунды возвращаем кнопку в исходное состояние
+    setTimeout(() => {
+      setIsAdded(false);
+    }, 2000);
   };
 
   return (
@@ -18,11 +26,18 @@ export default function ProductInteractiveControls({ product }) {
       <div className="qty">
         <button type="button" className="qty__btn" onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
         <input className="qty__input" type="number" value={qty} readOnly />
-        <button type="button" className="qty__btn" onClick={() => setQty(qty + 1)}>+</button>
+        <button type="button" className="qty__btn" onClick={() => setQty(Math.min(MAX_QTY, qty + 1))}>+</button>
       </div>
-      <button type="button" className="btn btn--primary btn--lg" onClick={handleAdd}>
-        В корзину
-      </button>
+      
+      {isAdded ? (
+        <button type="button" className="btn btn--success btn--lg" disabled>
+          <Check size={20} /> Добавлено в корзину
+        </button>
+      ) : (
+        <button type="button" className="btn btn--primary btn--lg" onClick={handleAdd}>
+          В корзину
+        </button>
+      )}
     </div>
   );
 }
